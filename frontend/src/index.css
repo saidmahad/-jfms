@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-[#F4F7FA] text-petrol-900 font-sans;
+  }
+
+  .dark body {
+    @apply bg-[#06111C] text-slate-100;
+  }
+
+  ::selection {
+    @apply bg-energy-500/30;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-white dark:bg-petrol-900 border border-petrol-100 dark:border-petrol-800 rounded-xl shadow-card;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-petrol-200 dark:border-petrol-700 bg-white dark:bg-petrol-950 px-3 py-2 text-sm text-petrol-900 dark:text-slate-100 placeholder:text-petrol-400 dark:placeholder:text-petrol-600 focus:outline-none focus:ring-2 focus:ring-energy-500/40 focus:border-energy-500 transition-colors;
+  }
+
+  .label {
+    @apply block text-xs font-semibold uppercase tracking-wide text-petrol-500 dark:text-petrol-400 mb-1.5;
+  }
+
+  .table-head {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-petrol-500 dark:text-petrol-400;
+  }
+
+  .table-cell {
+    @apply px-4 py-3 text-sm;
+  }
+}
+
+/* Slim scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 130, 140, 0.35) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(120, 130, 140, 0.35);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Print: only show the receipt area */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .print-area,
+  .print-area *,
+  .report-print-area,
+  .report-print-area * {
+    visibility: visible;
+  }
+  .print-area,
+  .report-print-area {
+    position: fixed;
+    inset: 0;
+    margin: 0 auto;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+    color: #071A2B !important;
+    overflow: visible !important;
+    max-height: none !important;
+    max-width: 100% !important;
+  }
+  .report-print-area .dark\:bg-petrol-900,
+  .report-print-area .dark\:bg-petrol-950 {
+    background: #fff !important;
+  }
+}
+
+/* Skeleton shimmer */
+.skeleton {
+  @apply relative overflow-hidden bg-petrol-100 dark:bg-petrol-800 rounded;
+}
+
+.skeleton::after {
+  content: '';
+  @apply absolute inset-0 -translate-x-full;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: shimmer 1.4s infinite;
+}
+
+.dark .skeleton::after {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+}
