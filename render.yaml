@@ -1,6 +1,8 @@
 # JUPA Fuel Station Management System — Render blueprint
 # Deploy with: https://render.com → New → Blueprint → select this repo
-# Replace the example URLs below with your actual service URLs.
+#
+# The backend serves both the REST API and the bundled React frontend,
+# so the whole system runs from a single origin (no CORS, no SPA rewrites).
 
 services:
   - type: web
@@ -8,28 +10,15 @@ services:
     runtime: node
     plan: free
     rootDir: backend
-    buildCommand: npm install && npm run db:setup
+    buildCommand: npm install && npm run build:client
     startCommand: npm run start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 10000
       - key: JWT_SECRET
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 12h
       - key: CORS_ORIGIN
-        value: https://jfms-app.onrender.com # <- your frontend URL
-
-  - type: web
-    name: jfms-app
-    runtime: static
-    plan: free
-    rootDir: frontend
-    buildCommand: npm install && npm run build
-    staticPublishPath: ./dist
-    envVars:
-      - key: VITE_API_URL
-        value: https://jfms-api.onrender.com # <- your backend URL
+        value: https://jfms-api.onrender.com # same origin — API URL

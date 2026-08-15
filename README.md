@@ -240,37 +240,29 @@ The project is deployment-ready. The frontend is a static Vite build; the backen
 ### Architecture
 
 ```
-Frontend (Vercel or Render static)
+One Render web service (jfms-api)
         │  HTTPS
-        ▼
-Backend API (Render web service)
-        │
-        ▼
-SQLite file (ephemeral on free plans — persisted on paid disks)
+        ├── /api/*  → Express REST API → SQLite
+        └── /*      → bundled React frontend (SPA fallback to index.html)
 ```
 
-### Option A — Render (both pieces)
+The Express server serves the built React app from `backend/public` with an SPA fallback, so the whole system runs from **one origin** — deep links (`/dashboard`, `/sales`) work on refresh, and no CORS config is needed. (The frontend build runs inside the backend build via `npm run build:client`.)
+
+### Deploy on Render (recommended)
 
 1. Push this repo to GitHub
-2. Go to [render.com](https://render.com) → **New → Blueprint** and select the repo
-3. Render reads `render.yaml` and creates:
-   - `jfms-api` — Node web service (migrates + seeds on build, health check at `/api/health`)
-   - `jfms-app` — static site serving the built frontend
-4. After the first deploy, copy the real service URLs into the `render.yaml` env vars (`CORS_ORIGIN` on the API, `VITE_API_URL` on the app) and redeploy, or set them in the Render dashboard
+2. Go to [render.com](https://render.com) → **New → Blueprint** → select the repo (or create a Web Service manually)
+3. Service settings:
+   - Root directory: `backend`
+   - Build: `npm install && npm run build:client`
+   - Start: `npm run start`
+   - Health check: `/api/health`
+   - Env vars: `NODE_ENV=production`, a strong `JWT_SECRET`, `CORS_ORIGIN=<your onrender.com URL>`
+4. The server auto-migrates + auto-seeds the database on startup, so demo accounts exist immediately
 
-### Option B — Vercel frontend + Render backend
+### Alternative — Vercel frontend + Render backend
 
-**Backend (Render):**
-
-1. Create a **Web Service** from the repo, root directory `backend`
-2. Build: `npm install && npm run db:setup` — Start: `npm run start`
-3. Set `NODE_ENV=production`, a strong `JWT_SECRET`, and `CORS_ORIGIN=https://<your-vercel-app>.vercel.app`
-
-**Frontend (Vercel):**
-
-1. Import the repo, framework preset **Vite**, root directory `frontend`
-2. Set environment variable `VITE_API_URL=https://<your-render-backend>.onrender.com`
-3. `frontend/vercel.json` already adds SPA rewrites so routes like `/sales` work on refresh
+The frontend also supports a split deployment: deploy `frontend` to Vercel (framework preset **Vite**, set `VITE_API_URL=https://<render-backend>.onrender.com`, `frontend/vercel.json` already adds SPA rewrites) and the backend to Render as above. In this mode the frontend calls the API cross-origin, so `CORS_ORIGIN` must include the Vercel URL.
 
 ### Demo accounts on any fresh deploy
 
