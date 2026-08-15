@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "start": "tsx src/server.ts",
+    "build:client": "npm install --prefix ../frontend --include=dev && npm run build --prefix ../frontend && node -e \"const fs=require('fs');fs.cpSync('../frontend/dist','./public',{recursive:true});console.log('[build:client] frontend copied to backend/public')\"",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
