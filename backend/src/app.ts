@@ -27,7 +27,9 @@ export function createApp() {
 
   app.disable('x-powered-by');
 
-  // Security headers
+  // Security headers. The CSP is relaxed enough to allow the bundled SPA
+  // (own scripts/styles, inline style attributes, Google Fonts, data: images,
+  // same-origin API calls) while still blocking third-party scripts/frames.
   app.use((_req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
@@ -35,7 +37,17 @@ export function createApp() {
     res.setHeader('X-XSS-Protection', '0');
     res.setHeader(
       'Content-Security-Policy',
-      "default-src 'none'; frame-ancestors 'none'",
+      [
+        "default-src 'self'",
+        "script-src 'self'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data:",
+        "connect-src 'self'",
+        "frame-ancestors 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+      ].join('; '),
     );
     next();
   });
